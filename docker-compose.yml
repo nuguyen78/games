@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+     - RABBITMQ_DEFAULT_USER=guest
+     - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+  mongodb:
+    image: mongo
+    ports:
+      - 27017:27017
+
+  games:
+    build: app
+    ports:
+      - 8001:8001
+    depends_on:
+      - mongodb
+      - rabbitmq
+    environment:
+      - MONGO_URL=mongodb+srv://admin:admin@wab.d99xhsu.mongodb.net/?retryWrites=true&w=majority
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+    command: sh -c "pdm run uvicorn src.main:app --host 0.0.0.0 --port 8001"
+
+  games1:
+    build: auth_service
+    depends_on:
+      - rabbitmq
+    ports:
+      - 8000:8000
+    command: sh -c "pdm run uvicorn src.main:app --host 0.0.0.0 --port 8000"
+
+  consumer:
+    build: consumer
+    depends_on:
+      - mongodb
+      - rabbitmq
+    ports:
+      - 8002:8002
+    environment:
+     - MONGO_URL=mongodb+srv://admin:admin@wab.d99xhsu.mongodb.net/?retryWrites=true&w=majority
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+    command: sh -c "pdm run uvicorn src.main:app --host 0.0.0.0 --port 8002"

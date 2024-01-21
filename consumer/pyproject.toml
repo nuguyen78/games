@@ -1,0 +1,27 @@
+[project]
+name = "consumer"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "Petr Nguyen", email = ""},
+]
+dependencies = [
+      "pika>=1.3.2",
+    "uvicorn[standard]>=0.23.2",
+    "fastapi>=0.104.1",
+    "pymongo>=3.12.0",
+]
+requires-python = ">=3.11"
+readme = "README.md"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+
+[tool.pdm]
+distribution = true
+
+[tool.pdm.scripts]
+dev = "uvicorn src.main:app --reload"
